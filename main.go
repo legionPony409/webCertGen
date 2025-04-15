@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/legionPony409/webCertGen/certManager"
 )
 
 // handler обрабатывает как GET, так и POST запросы к корневому URL.
@@ -24,7 +26,7 @@ func checkCertHandler(w http.ResponseWriter, r *http.Request) {
 
 	outputBuffer := new(bytes.Buffer)
 	if inputText != "" {
-		CheckCertificate(strings.NewReader(inputText), outputBuffer)
+		certManager.CheckCertificate(strings.NewReader(inputText), outputBuffer)
 	}
 
 	data := map[string]interface{}{
@@ -41,8 +43,8 @@ func checkCertHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createCaCertHandler(w http.ResponseWriter, r *http.Request) {
-	var certInfo CertificateInfo
-	certInfo.CertOption = CaCert
+	var certInfo certManager.CertificateInfo
+	certInfo.CertOption = certManager.CaCert
 
 	tmpl, err := template.ParseFiles("templates/createCaCert.html")
 	if err != nil {
@@ -59,7 +61,7 @@ func createCaCertHandler(w http.ResponseWriter, r *http.Request) {
 
 	outputBuffer := new(bytes.Buffer)
 	if certInfo.Org != "" && certInfo.Country != "" && certInfo.CommonName != "" {
-		CreateCertificate(&certInfo, outputBuffer)
+		certManager.CreateCertificate(&certInfo, outputBuffer)
 	} else {
 		outputBuffer.Write([]byte("Enter all fields!"))
 	}
@@ -80,8 +82,8 @@ func createCaCertHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createServerCertHandler(w http.ResponseWriter, r *http.Request) {
-	var certInfo CertificateInfo
-	certInfo.CertOption = CaCert
+	var certInfo certManager.CertificateInfo
+	certInfo.CertOption = certManager.CaCert
 
 	outputBuffer := new(bytes.Buffer)
 
@@ -102,20 +104,20 @@ func createServerCertHandler(w http.ResponseWriter, r *http.Request) {
 
 		switch choice {
 		case "ServerCert":
-			certInfo.CertOption = ServerCert
+			certInfo.CertOption = certManager.ServerCert
 		case "KubeServiceCert":
-			certInfo.CertOption = KubeServiceCert
+			certInfo.CertOption = certManager.KubeServiceCert
 			certInfo.KubeInfo.EnvName = r.FormValue("kubeEnv")
 			certInfo.KubeInfo.ServiceName = r.FormValue("kubeServiceName")
 			certInfo.KubeInfo.Namespace = r.FormValue("kubeNamespace")
 		}
 
-		certInfo.CaPublicCert, certInfo.CaPrivateCert = ExtractRawCertificate(strings.NewReader(inputCaText))
+		certInfo.CaPublicCert, certInfo.CaPrivateCert = certManager.ExtractRawCertificate(strings.NewReader(inputCaText))
 
 		if certInfo.Org != "" && certInfo.Country != "" && certInfo.CommonName != "" &&
 			certInfo.CaPublicCert != nil && certInfo.CaPrivateCert != nil &&
-			certInfo.CertOption != CaCert {
-			CreateCertificate(&certInfo, outputBuffer)
+			certInfo.CertOption != certManager.CaCert {
+			certManager.CreateCertificate(&certInfo, outputBuffer)
 		} else {
 			outputBuffer.Write([]byte("Enter all fields!"))
 		}
