@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <button onclick="window.location.href='/'" class="button">Go to main page</button>
+    <h1>{{.Body}}</h1>
+ 
+    
+    <!-- Форма с полем ввода и кнопкой -->
+    <form method="POST" action="/checkCert">
+        <!-- Используем textarea, чтобы можно было вводить много строк -->
+        <textarea name="input" rows="10" cols="50" placeholder="Введите текст">{{.Input}}</textarea>
+        <br>
+        <button type="submit">Отправить</button>
+    </form>
+    
+    <!-- Блок для вывода результата, если он имеется -->
+    {{if .Output}}
+    <div class="output">
+        <h2>Результат:</h2>
+        <pre>{{.Output}}</pre>
+    </div>
+    {{end}}
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Скрываем блок с дополнительными полями по умолчанию */
+        #extraFields {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="window.location.href='/'" class="button1">Go to main page</button>
+    <h1>{{.Body}}</h1>
+
+    <!-- Форма с полем ввода и кнопкой -->
+    <form method="POST" action="/createServerCert">
+        <h3>Enter CA certificate pair</h3>
+        <textarea name="inputCA" id="textCaPublic" rows="10" cols="50" placeholder="Введите текст">{{.caCertPair}}</textarea>
+
+        <p>Выберите один из вариантов:</p>
+        <input type="radio" id="option1" name="choice" value="ServerCert" {{if eq .choice "ServerCert"}}checked{{end}}>
+        <label for="option1">Usual server certificate</label><br>
+    
+        <input type="radio" id="option2" name="choice" value="KubeServiceCert"{{if eq .choice "KubeServiceCert"}}checked{{end}}>
+        <label for="option2">Kubernetes service certificate</label><br>
+
+        <div id="extraFields">
+            <h3>Kubernetes info:</h3>
+            <label for="field1">Kube env name:</label>
+            <input type="text" id="field1" name="kubeEnv" placeholder="Введите значение" value="{{.kubeEnv}}"><br>
+            
+            <label for="field2">Kube service name:</label>
+            <input type="text" id="field2" name="kubeServiceName" placeholder="Введите значение" value="{{.kubeServiceName}}"><br>
+            
+            <label for="field3">Kube namespace:</label>
+            <input type="text" id="field3" name="kubeNamespace" placeholder="Введите значение"  value="{{.kubeNamespace}}"><br>
+        </div>
+        
+        
+        <h3>Enter organization name</h3>
+        <input type="text" name="org" placeholder="example inc" value="{{.org}}">
+        <br>
+        <h3>Enter country name</h3>
+        <input type="text" name="country" placeholder="KZ" value="{{.country}}">
+        <br>
+        <h3>Enter common name for certificate</h3>
+        <input type="text" name="commonName" placeholder="Example team" value="{{.commonName}}">
+        <br>
+        <br>
+        <button type="submit">Отправить</button>
+    </form>
+    
+    <!-- Блок для вывода результата, если он имеется -->
+    {{if .Output}}
+    <div class="outputCert">
+        <h2>Результат:</h2>
+        <pre>{{.Output}}</pre>
+    </div>
+    {{end}}
+
+    <script>
+        // Функция, которая будет переключать видимость дополнительных полей
+        function toggleExtraFields() {
+            // Получаем выбранное значение радиокнопки
+            const selected = document.querySelector('input[name="choice"]:checked');
+            const extraFields = document.getElementById("extraFields");
+
+            // Если выбрано значение "KubeServiceCert", показываем дополнительные поля,
+            // иначе скрываем их.
+            if (selected && selected.value === "KubeServiceCert") {
+                extraFields.style.display = "block";
+            } else {
+                extraFields.style.display = "none";
+            }
+        }
+
+        // Добавляем обработчик события изменения для всех радиокнопок с именем "choice"
+        document.querySelectorAll('input[name="choice"]').forEach(function(elem) {
+            elem.addEventListener("change", toggleExtraFields);
+        });
+
+        // Если форма уже загружена и какая-то радиокнопка выбрана, проверяем её состояние
+        window.addEventListener("DOMContentLoaded", toggleExtraFields);
+    </script>
+</body>
+</html>

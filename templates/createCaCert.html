@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <button onclick="window.location.href='/'" class="button1">Go to main page</button>
+    <h1>{{.Body}}</h1>
+  
+    <!-- Форма с полем ввода и кнопкой -->
+    <form method="POST" action="/createCaCert">
+        <h3>Enter organization name</h3>
+        <input type="text" name="org" placeholder="example inc" value="{{.org}}">
+        <br>
+        <h3>Enter country name</h3>
+        <input type="text" name="country" placeholder="KZ" value="{{.country}}">
+        <br>
+        <h3>Enter common name for certificate</h3>
+        <input type="text" name="commonName" placeholder="Example team" value="{{.commonName}}">
+        <br>
+        <br>
+        <button type="submit">Отправить</button>
+    </form>
+    
+    <!-- Блок для вывода результата, если он имеется -->
+    {{if .Output}}
+    <div class="outputCert">
+        <h2>Результат:</h2>
+        <pre>{{.Output}}</pre>
+    </div>
+    {{end}}
+</body>
+</html>
